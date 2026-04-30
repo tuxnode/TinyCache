@@ -17,7 +17,7 @@ func (c *Cache) Add(key string, value []byte) {
 	if c.lru == nil {
 		c.lru = NewLUR(c.cacheBytes)
 	}
-	c.Add(key, value)
+	c.lru.AddElement(key, value)
 }
 
 func (c *Cache) Get(key string) (value []byte, ok bool) {
