@@ -9,7 +9,7 @@ type entry struct {
 	value any
 }
 
-type lur struct {
+type lru struct {
 	maxByte int
 	nbyte   int // 已写入字符
 	ll      *list.List
@@ -17,8 +17,8 @@ type lur struct {
 }
 
 /* Init Lur */
-func NewLUR(maxByte int) *lur {
-	return &lur{
+func NewLUR(maxByte int) *lru {
+	return &lru{
 		maxByte: maxByte,
 		ll:      list.New(),
 		cache:   make(map[string]*list.Element),
@@ -26,7 +26,7 @@ func NewLUR(maxByte int) *lur {
 }
 
 /* 向Lur缓存添加数据 */
-func (c *lur) AddElement(key string, value any) {
+func (c *lru) AddElement(key string, value any) {
 	if ele, ok := c.cache[key]; ok {
 		c.ll.MoveToFront(ele)
 		// 类型断言
@@ -44,7 +44,7 @@ func (c *lur) AddElement(key string, value any) {
 	}
 }
 
-func (c *lur) RemoveOldest() {
+func (c *lru) RemoveOldest() {
 	ele := c.ll.Back()
 	if ele != nil {
 		c.ll.Remove(ele)
