@@ -9,6 +9,8 @@ import (
 func TestCacheZeroValueStartsEmpty(t *testing.T) {
 	var c Cache
 
+	t.Log("case: zero-value cache should behave like an empty cache")
+
 	if got := callLen(t, &c); got != 0 {
 		t.Fatalf("Len() = %d, want 0", got)
 	}
@@ -25,6 +27,7 @@ func TestCacheZeroValueStartsEmpty(t *testing.T) {
 func TestCacheAddGetAndUpdateExistingKey(t *testing.T) {
 	var c Cache
 
+	t.Log("case: add one key and read it back")
 	c.Add("name", []byte("test"))
 
 	value, ok := c.Get("name")
@@ -35,6 +38,7 @@ func TestCacheAddGetAndUpdateExistingKey(t *testing.T) {
 		t.Fatalf("Get(name) = %q, want %q", value, []byte("test"))
 	}
 
+	t.Log("case: update the same key and keep entry count unchanged")
 	c.Add("name", []byte("next"))
 
 	value, ok = c.Get("name")
@@ -50,6 +54,7 @@ func TestCacheAddGetAndUpdateExistingKey(t *testing.T) {
 	}
 
 	stats := callStats(t, &c)
+	t.Logf("stats after update: %+v", stats)
 	if stats["Entries"] != 1 {
 		t.Fatalf("Stats().Entries = %d, want 1", stats["Entries"])
 	}
@@ -61,6 +66,7 @@ func TestCacheAddGetAndUpdateExistingKey(t *testing.T) {
 func TestGetRefreshesRecency(t *testing.T) {
 	c := &Cache{cacheBytes: 4}
 
+	t.Log("case: Get should refresh recency before capacity eviction")
 	c.Add("a", []byte("1"))
 	c.Add("b", []byte("2"))
 
@@ -84,6 +90,7 @@ func TestGetRefreshesRecency(t *testing.T) {
 func TestPeekDoesNotRefreshRecency(t *testing.T) {
 	c := &Cache{cacheBytes: 4}
 
+	t.Log("case: Peek should not refresh recency")
 	c.Add("a", []byte("1"))
 	c.Add("b", []byte("2"))
 
@@ -111,6 +118,7 @@ func TestPeekDoesNotRefreshRecency(t *testing.T) {
 func TestDeleteRemovesEntryAndReportsPresence(t *testing.T) {
 	var c Cache
 
+	t.Log("case: Delete should remove an existing key and report existence correctly")
 	c.Add("a", []byte("1"))
 	c.Add("b", []byte("2"))
 
@@ -134,6 +142,7 @@ func TestDeleteRemovesEntryAndReportsPresence(t *testing.T) {
 func TestClearRemovesAllEntries(t *testing.T) {
 	var c Cache
 
+	t.Log("case: Clear should remove all entries and reset live byte usage")
 	c.Add("a", []byte("1"))
 	c.Add("b", []byte("22"))
 
@@ -155,6 +164,7 @@ func TestClearRemovesAllEntries(t *testing.T) {
 	}
 
 	stats := callStats(t, &c)
+	t.Logf("stats after clear: %+v", stats)
 	if stats["Entries"] != 0 {
 		t.Fatalf("Stats().Entries after Clear = %d, want 0", stats["Entries"])
 	}
@@ -166,6 +176,7 @@ func TestClearRemovesAllEntries(t *testing.T) {
 func TestStatsTracksCacheActivity(t *testing.T) {
 	c := &Cache{cacheBytes: 4}
 
+	t.Log("case: Stats should track hits, misses, evictions, deletes, entries, and bytes")
 	c.Add("a", []byte("1"))
 	c.Add("b", []byte("2"))
 
@@ -183,6 +194,7 @@ func TestStatsTracksCacheActivity(t *testing.T) {
 	}
 
 	stats := callStats(t, c)
+	t.Logf("stats snapshot: %+v", stats)
 	if stats["Hits"] != 1 {
 		t.Fatalf("Stats().Hits = %d, want 1", stats["Hits"])
 	}
